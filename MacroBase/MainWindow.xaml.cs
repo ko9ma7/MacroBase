@@ -1,4 +1,7 @@
-﻿using System;
+﻿/*
+ * 処理チェック用
+ */ 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,14 +18,19 @@ using System.Windows.Shapes;
 
 namespace MacroBase
 {
-    /// <summary>
-    /// MainWindow.xaml の相互作用ロジック
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+            MM.MainWin = this;
+        }
+
+        //キャプチャウィドウ
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            WINDOW.CaptureWin win = new WINDOW.CaptureWin(4);
+            win.ShowDialog();
         }
     }
 }

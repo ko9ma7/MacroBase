@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MacroBase.MACRO
 {
-    public class MacroBase
+    public class TMacroBase
     {
         public TMacroList parentlist;
         public int index;
@@ -42,9 +42,19 @@ namespace MacroBase.MACRO
 
             return (T)obj;
         }
+
+        public TMacroBase(TMacroList parent, string _MacroParamStr, int _CommandNo, string[] _Param)
+        {
+            parentlist = parent;
+            index = parentlist.Count;
+            CheckedFlg = false;
+            MacroParamStr = _MacroParamStr;
+            CommandNo = _CommandNo;
+            Param = _Param;
+        }
     }
 
-    public class TMacroList : List<MacroBase>
+    public class TMacroList : List<TMacroBase>
     {
 
     }
