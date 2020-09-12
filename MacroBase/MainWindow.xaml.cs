@@ -29,7 +29,7 @@ namespace MacroBase
         //キャプチャウィドウ
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            WINDOW.CaptureWin win = new WINDOW.CaptureWin(4);
+            WINDOW.CaptureWin win = new WINDOW.CaptureWin(5);
             win.ShowDialog();
         }
     }

@@ -20,13 +20,17 @@ namespace MacroBase.WINDOW
     public partial class CaptureWin : Window
     {
         public int mode;                            //動作モード 1=範囲キャプチャ   2=絶対位置クリック 3=相対位置クリック
-                                                    //4=位置確認
+                                                    //4=位置確認　5=連続クリック座標
         public System.Drawing.Rectangle rect;       //選択された範囲
         private double posx, posy;                  //最初に選択した座標
         public System.Drawing.Point pnt;            //マッチ位置(mode=3)
         public double score = 0;                    //マッチスコア(mode=3)
         public int DrawX = 0, DrawY = 0;            //×を描画する位置(mode=4)
         public System.Drawing.Rectangle matchrect;  //マッチ四角(mode=4)
+
+        #region "mode=5"
+        public List<Point> clicklist;               //連続クリックされた座標のリスト
+        #endregion
 
         public CaptureWin(int mode)
         {
@@ -53,7 +57,11 @@ namespace MacroBase.WINDOW
                 label.Content = "座標確認モード";
                 label.Margin = new Thickness(Width / 2 - 50, Height / 2 - 50, 0.0, 0.0);
                 CheckLabel.Visibility = Visibility.Visible;
-
+            }else if(mode == 5)
+            {
+                label.Content = "連続座標選択　終了は右クリック";
+                label.Margin = new Thickness(Width / 2 - 50, Height / 2 - 50, 0.0, 0.0);
+                clicklist = new List<Point>();
             }
             MM.MainWin.Hide();
         }
@@ -71,6 +79,7 @@ namespace MacroBase.WINDOW
                 rectangle.Visibility = Visibility.Visible;
             }
         }
+
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.RightButton == MouseButtonState.Pressed)
@@ -94,6 +103,28 @@ namespace MacroBase.WINDOW
             else if (mode == 3)
             {
                 //this.MouseUp += Window_MouseUp;
+            }
+            else if(mode == 5)
+            {
+                if(e.RightButton == MouseButtonState.Pressed)
+                {
+                    this.Cursor = Cursors.Arrow;
+                    MM.MainWin.Show();
+                    try
+                    {
+                        this.DialogResult = true;
+                    }
+                    catch { }
+                }
+                clicklist.Add(point);
+                TextBlock txtb = new TextBlock();
+                txtb.Text = "[" + clicklist.Count.ToString() + "]";
+                txtb.FontSize = 25;
+                txtb.Foreground = Brushes.Red;
+                txtb.FontWeight = FontWeights.ExtraBold;
+                Canvas.SetLeft(txtb, point.X -12);
+                Canvas.SetTop(txtb, point.Y -20);
+                canvas.Children.Add(txtb);
             }
         }
 
@@ -121,13 +152,16 @@ namespace MacroBase.WINDOW
             }
             else if(mode == 4)
             {
-                label.Content = string.Format("絶対座標({0},{1})", point.X, point.Y);
+                label.Content = string.Format("座標確認モード\r\n絶対座標({0},{1})", point.X, point.Y);
+            }
+            else if (mode == 5)
+            {
+                label.Content = string.Format("連続座標選択　終了は右クリック\r\n絶対座標({0},{1})", point.X, point.Y);
             }
         }
 
         private void Window_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            this.Cursor = Cursors.Arrow;
 
             Point point = e.GetPosition(this);
             if (mode == 1 || mode == 2)
@@ -138,8 +172,12 @@ namespace MacroBase.WINDOW
             {
                 rect = new System.Drawing.Rectangle((int)point.X - pnt.X, (int)point.Y - pnt.Y, (int)rectangle.Width, (int)rectangle.Height);
             }
-            MM.MainWin.Show();
-            this.DialogResult = true;
+            if(mode != 5)
+            {
+                this.Cursor = Cursors.Arrow;
+                MM.MainWin.Show();
+                this.DialogResult = true;
+            }
         }
 
     }
